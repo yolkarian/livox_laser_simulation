@@ -16,6 +16,8 @@
 
 namespace gazebo {
 
+std::string frameElem;
+
 GZ_REGISTER_SENSOR_PLUGIN(LivoxPointsPlugin)
 
 LivoxPointsPlugin::LivoxPointsPlugin() {}
@@ -46,6 +48,7 @@ void LivoxPointsPlugin::Load(gazebo::sensors::SensorPtr _parent, sdf::ElementPtr
         return;
     }
     sdfPtr = sdf;
+    frameElem = sdfPtr->Get<std::string>("frameName");
     auto rayElem = sdfPtr->GetElement("ray");
     auto scanElem = rayElem->GetElement("scan");
     auto rangeElem = rayElem->GetElement("range");
@@ -128,7 +131,7 @@ void LivoxPointsPlugin::OnNewLaserScans() {
 
         sensor_msgs::PointCloud scan_point;
         scan_point.header.stamp = ros::Time::now();
-        scan_point.header.frame_id = raySensor->Name();
+        scan_point.header.frame_id = frameElem;
         auto &scan_points = scan_point.points;
 
         for (auto &pair : points_pair) {
